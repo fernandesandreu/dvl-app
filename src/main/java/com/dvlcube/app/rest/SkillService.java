@@ -4,7 +4,9 @@ import static com.dvlcube.app.manager.data.e.Menu.CONFIGURATION;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -39,7 +41,7 @@ public class SkillService implements MxFilterableBeanService<SkillBean, Long> {
 	@Override
 	@GetMapping
 	public Iterable<SkillBean> get(@RequestParam Map<String, String> params) {
-		return repo.firstPage();
+		return repo.firstPage().stream().sorted((i1, i2) -> i1.getName().compareTo(i2.getName())).collect(Collectors.toList());
 	}
 
 	@Override
@@ -78,13 +80,27 @@ public class SkillService implements MxFilterableBeanService<SkillBean, Long> {
 		return repo.findAllBy(params, group);
 	}
 
-	@GetMapping("/like")
-	public Iterable<SkillBean> getLike(@RequestParam(required = true) String id) {
-		return repo.findAllLike(id);
+	@GetMapping("/like/{name}")
+	public Iterable<SkillBean> getLike(@PathVariable String name) {
+		return repo.findAllLike(name);
 	}
 
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		repo.deleteById(id);
 	}
+	
+	@GetMapping("/name/{name}")
+	public SkillBean getByName(@PathVariable String name) {
+		return repo.findByName(name);
+	}
+	
+	@GetMapping("/exist/name/{name}")
+	public String getExistByName(@PathVariable String name) {
+		
+		SkillBean sb = repo.findByName(name);
+		
+		return Objects.isNull(sb) ? "Not Exist":"Exist";
+	}
+	
 }

@@ -6,6 +6,7 @@ import static com.dvlcube.utils.query.MxQuery.$;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +42,9 @@ public class StatService implements MxService {
 	 */
 	@GetMapping
 	public List<Stat> get(@RequestParam Map<String, String> params) {
-		return Stats.values();
+		return Stats.values().stream().sorted((i1, i2) -> i1.getTotal().compareTo(i2.getTotal()))
+				.sorted((i1, i2) -> i2.avg().compareTo(i1.avg()))
+				.collect(Collectors.toList());
 	}
 
 	/**
